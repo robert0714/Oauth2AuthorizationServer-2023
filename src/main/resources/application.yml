@@ -37,7 +37,7 @@ spring:
   datasource:
     username: sa
     password: ENC(USSQQJG+zy7EHGoUQ3qJLLoiqi5hwJcI20GqhATi+QMWVjf4AVCRFtJXlRtyaAYn)
-    url: jdbc:sqlserver://192.168.52.52:1433;databaseName=rds;encrypt=false;integratedSecurity=false
+    url: jdbc:sqlserver://localhost;databaseName=rds;encrypt=false;integratedSecurity=false
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     hikari:
       maximum-pool-size: 25
@@ -49,9 +49,9 @@ spring:
     activate:
       on-profile: oracle 
   datasource:
-    username: NCA_INT_TEST
-    password: info1235 
-    url: jdbc:oracle:thin:@35.187.156.34:1521/LST
+    username: yourname
+    password: yourpassword
+    url: jdbc:oracle:thin:@localhost:1521/LST
     driver-class-name: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: 25
