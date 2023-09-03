@@ -1,0 +1,5 @@
+JAVA_OPTS=-javaagent:/deployments/elastic-apm-agent-1.38.0.jar 
+ELASTIC_APM_SERVER_URLS=http://34.81.143.123:8200
+ELASTIC_APM_SERVICE_NAME=oauth-authorization-server
+ELASTIC_APM_APPLICATION_PACKAGES=com.demo
+ELASTIC_APM_TRACE_METHODS=com.demo.*

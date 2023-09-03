@@ -1,0 +1,100 @@
+spring:
+  profiles:
+    active:
+    - memory
+  datasource:    
+    hikari:
+      maximum-pool-size: 25
+      minimum-idle: 1
+  jackson:
+    date-format: yyyy-MM-dd
+    locale: zh_TW
+    time-zone: GMT+8 
+
+    
+management:
+  endpoints:
+    web:
+      base-path: /rest/actuator
+      exposure:
+        include: '*'
+app:
+  description: '@tmf-version@' 
+server:
+  port: 9000
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /auth
+jasypt:
+  encryptor:
+    password: nca
+logging:  
+  level:
+    org.springframework: DEBUG
+    org.springframework.web: ERROR
+
+    
+---
+spring:
+  config:
+    activate:
+      on-profile: mssql 
+  datasource:
+    username: sa
+    password: ENC(USSQQJG+zy7EHGoUQ3qJLLoiqi5hwJcI20GqhATi+QMWVjf4AVCRFtJXlRtyaAYn)
+    url: jdbc:sqlserver://192.168.52.52:1433;databaseName=rds;encrypt=false;integratedSecurity=false
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: true
+    defer-datasource-initialization: true
+#    hibernate.ddl-auto: update
+    hibernate.ddl-auto: create    
+    generate-ddl: true
+    show-sql: true     
+---
+spring:
+  config:
+    activate:
+      on-profile: oracle 
+  datasource:
+    username: NCA_INT_TEST
+    password: info1235 
+    url: jdbc:oracle:thin:@35.187.156.34:1521/LST
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+        format_sql: true
+    defer-datasource-initialization: true
+#    hibernate.ddl-auto: update
+    hibernate.ddl-auto: create    
+    generate-ddl: true
+    show-sql: true 
+---
+spring:
+  config:
+    activate:
+      on-profile: h2
+  datasource:
+    username: sa
+    url: jdbc:h2:./data/keycloak;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+    defer-datasource-initialization: true
+#    hibernate.ddl-auto: update
+    hibernate.ddl-auto: create    
+    generate-ddl: true
+    show-sql: true 
+---
+spring:
+  config:
+    activate:
+      on-profile: memory

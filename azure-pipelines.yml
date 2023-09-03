@@ -1,0 +1,79 @@
+trigger:
+  - profiles-all-in-one-v1
+pool:
+  name: GCP
+  demands:
+    # - agent.name -equals backend-agent
+    - agent.name -equals frontend-agent
+    
+variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+steps:
+  - task: Cache@2
+    inputs:
+      key: maven | "$(Agent.OS)" | **/pom.xml
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+        maven
+      path: $(MAVEN_CACHE_FOLDER)
+    displayName: Cache Maven local repo
+  - task: Maven@4
+    inputs:
+      mavenPomFile: pom.xml 
+      goals: 'javadoc:javadoc package sonar:sonar '
+      options: '  --settings $(Build.SourcesDirectory)/settings.xml  -Dtmf-version=$(Build.BuildNumber) -Dsonar.login=sqa_cf6e048fb5e9f2c1eef202e5fcb3a44b4fb116d0'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: JDKVersion
+      jdkVersionOption: '17'
+      mavenVersionOption: Default
+      mavenOptions: '-Xmx3072m  $(MAVEN_OPTS)'
+      mavenAuthenticateFeed: true
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false
+      checkStyleRunAnalysis: false
+      pmdRunAnalysis: false
+      findBugsRunAnalysis: false
+      javadoc: true
+
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+         docker rm  -f  auth
+      displayName: 'stop current job'
+      continueOnError: true
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: JaCoCo
+      summaryFileLocation: $(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml
+      pathToSources: $(System.DefaultWorkingDirectory)/src/main/java/
+ 
+  - task: PublishPipelineArtifact@1
+    continueOnError: true
+    inputs:
+      targetPath: $(System.DefaultWorkingDirectory)/target/site/apidocs
+      artifactName: JavaDoc
+
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+         export BUILD_NUMBER=$(Build.BuildNumber)
+         echo   'build 編號  #'${BUILD_NUMBER}
+         docker build -t auth:${BUILD_NUMBER}  .
+      displayName: 'building docker image'
+      continueOnError: true
+      workingDirectory: $(Build.SourcesDirectory)
+
+  - task: Bash@3
+    inputs:
+      targetType: inline
+      script: |
+        export BUILD_NUMBER=$(Build.BuildNumber)
+        echo   'build 編號  #'${BUILD_NUMBER}
+        docker images
+        docker run -p 8081:9000 -it -d --name auth --env-file dockerenv auth:${BUILD_NUMBER}
+      displayName: deploy nca-mock-backend
