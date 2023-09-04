@@ -21,8 +21,8 @@ steps:
   - task: Maven@4
     inputs:
       mavenPomFile: pom.xml 
-      goals: 'javadoc:javadoc package sonar:sonar '
-      options: '  --settings $(Build.SourcesDirectory)/settings.xml  -Dtmf-version=$(Build.BuildNumber) -Dsonar.login=sqa_cf6e048fb5e9f2c1eef202e5fcb3a44b4fb116d0'
+      goals: 'javadoc:javadoc package  '
+      options: ' -Dtmf-version=$(Build.BuildNumber) '
       publishJUnitResults: true
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       javaHomeOption: JDKVersion
